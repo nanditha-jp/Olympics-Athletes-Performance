@@ -1,0 +1,9 @@
+stages:
+  scrape_data:
+    cmd: python -m src.scrape.scrape_data
+    deps:
+    - src/scrape/scrape_data.py
+    outs:
+    - data/raw/bios.csv
+    - data/raw/results.csv
+    frozen: true

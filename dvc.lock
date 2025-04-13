@@ -1,0 +1,18 @@
+schema: '2.0'
+stages:
+  scrape_data:
+    cmd: python -m src.scrape.scrape_data
+    deps:
+    - path: src/scrape/scrape_data.py
+      hash: md5
+      md5: 77418fbe1dfb65070766f39c47b0f374
+      size: 3356
+    outs:
+    - path: data/raw/bios.csv
+      hash: md5
+      md5: be7aea18c0aff8c79cb1637822b9475d
+      size: 28114934
+    - path: data/raw/results.csv
+      hash: md5
+      md5: b9ce89b1ee2b032595e9a71ae22ddb81
+      size: 34559160
