@@ -1,6 +1,7 @@
 import numpy as np
 import pandas as pd
 
+import re
 import os
 import src.utils as utils
 
@@ -34,6 +35,65 @@ def remove_unnecessary_columns(data: pd.DataFrame) -> pd.DataFrame:
         logger.error("Error removing unnecessary columns: %s", e)
         return pd.DataFrame()
 
+def extract_postions(data: pd.DataFrame) -> pd.DataFrame:
+    try:
+        logger.debug("Extracting positions")
+        df = data.copy()
+
+        def parse_position(pos_val):
+            if pd.isna(pos_val):
+                return None
+
+            if isinstance(pos_val, (int, float)):
+                return float(pos_val)
+
+            pos_str = str(pos_val).strip()
+
+            # These are status codes, not positions
+            if re.match(r'(?i)^\s*(DNS|DNF|DSQ|RET|WD|AC)', pos_str):
+                return None
+
+            # Remove '=' if it's used to indicate tied positions like '=81'
+            pos_str = pos_str.lstrip('=').strip()
+
+            # Extract leading number only (to avoid grabbing lane/heat numbers)
+            match = re.match(r'^(\d+)', pos_str)
+            if match:
+                return float(match.group(1))
+
+            return None
+        
+        df["Pos"] = df["Pos"].apply(parse_position)
+
+        return df
+
+    except Exception as e:
+        logger.error("Error extracting positions: %s", e)
+        return pd.DataFrame()
+
+def rename_and_reorder(data: pd.DataFrame) -> pd.DataFrame:
+    try:
+        logger.debug("Renaming and reordering columns")
+        df = data.copy()
+
+        df = df.rename(columns={
+            "Pos": "pos",
+            "NOC": "noc",
+            "Event": "event",
+            "Discipline": "discipline",
+            "Team": "team",
+            "As": "as",
+            "Medal": "medal"
+        })
+
+        columns_ordered = ['athlete_id', 'noc', 'year', 'type', 'discipline', 'event', 'team', 'as','pos', 'medal']
+
+        return df[columns_ordered]
+
+    except Exception as e:
+        logger.error("Error renaming and reordering columns: %s", e)
+        return pd.DataFrame()
+
 
 if __name__ == "__main__":
 
@@ -49,7 +109,9 @@ if __name__ == "__main__":
         # clean data pipeline
         results = (
             results.pipe(clean_game_column)
+            .pipe(extract_postions)
             .pipe(remove_unnecessary_columns)
+            .pipe(rename_and_reorder)
         )
 
         # save data
