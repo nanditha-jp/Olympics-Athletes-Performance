@@ -41,8 +41,8 @@ stages:
       size: 34559160
     - path: src/data/clean_athletes_results.py
       hash: md5
-      md5: b2bed965b816913a77dc5333079b1061
-      size: 3651
+      md5: a5995b70dfb262c67adc03a71ff8420b
+      size: 3851
     outs:
     - path: data/interim/results.csv
       hash: md5
