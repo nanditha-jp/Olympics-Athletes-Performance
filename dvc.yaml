@@ -14,3 +14,10 @@ stages:
     - data/raw/bios.csv
     outs:
     - data/interim/bios.csv
+  clean_athletes_results:
+    cmd: python -m src.data.clean_athletes_results
+    deps:
+    - src/data/clean_athletes_results.py
+    - data/raw/results.csv
+    outs:
+    - data/interim/results.csv
