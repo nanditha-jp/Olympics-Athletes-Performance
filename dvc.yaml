@@ -7,3 +7,10 @@ stages:
     - data/raw/bios.csv
     - data/raw/results.csv
     frozen: true
+  clean_athletes_bio:
+    cmd: python -m src.data.clean_athletes_bio
+    deps:
+    - src/data/clean_athletes_bio.py
+    - data/raw/bios.csv
+    outs:
+    - data/interim/bios.csv
