@@ -46,3 +46,9 @@ def save_data(
         logger.info("Data saved successfully")
     except Exception as e:
         logger.error(f"Error saving data: {e}")
+
+def apply_filters(df, filters):
+    for column, values in filters.items():
+        if column in df.columns:
+            df = df[df[column].isin(values)]
+    return df
