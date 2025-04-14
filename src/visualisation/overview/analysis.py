@@ -16,26 +16,9 @@ results = utils.load_data(os.path.join(data_path, "results.csv"), logger)
 
 # merge data
 results = results.merge(
-    bios[["athlete_id", "born_year", "sex"]], on="athlete_id", how="left"
+    bios[["athlete_id", "born_year", "sex", "height"]], on="athlete_id", how="left"
 )
 results["age"] = results["year"].astype(float) - results["born_year"].astype(float)
-
-
-# load metrics
-def get_total_athletes():
-    return DAX.total_athletes(results)
-
-
-def get_total_events():
-    return DAX.total_events(results)
-
-
-def get_avg_height():
-    return DAX.avg_height(bios)
-
-
-def get_avg_age():
-    return DAX.avg_age(results)
 
 
 # Utilities
@@ -50,11 +33,30 @@ def get_unique(column):
 
 def apply_filters(df, filters):
     for column, values in filters.items():
-        if column == "year" and len(values) == 0:
-            continue
         if column in df.columns:
             df = df[df[column].isin(values)]
     return df
+
+
+# load metrics
+def get_total_athletes(filters):
+    df = apply_filters(results, filters)
+    return DAX.total_athletes(df)
+
+
+def get_total_events(filters):
+    df = apply_filters(results, filters)
+    return DAX.total_events(df)
+
+
+def get_avg_height(filters):
+    df = apply_filters(results, filters)
+    return DAX.avg_height(df)
+
+
+def get_avg_age(filters):
+    df = apply_filters(results, filters)
+    return DAX.avg_age(df)
 
 
 # Analysis fns
