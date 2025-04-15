@@ -77,7 +77,7 @@ def age_distribution_across_sports(filters, top_n):
     return avg_age_by_sport
 
 def participation_trend_over_time(filters, past_n_years=10):
-    df = utils.apply_filters(results, filters)
+    df = results.copy()
     # Filter for the past 10 years (e.g., from 2010 onward)
     if "year" in filters.keys():
         max_year = max(filters["year"])
