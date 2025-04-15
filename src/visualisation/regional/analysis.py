@@ -17,11 +17,18 @@ results = utils.load_data(os.path.join(data_path, "results.csv"), logger)
 merged = results.merge(
     bios[["athlete_id", "noc", "sex"]], on="athlete_id", how="left"
 )
+merged = merged.rename(columns={"noc_y": "country", "noc_x": "noc"})
+
+# Utilities
+def get_unique(column):
+    if column in merged.columns:
+        return sorted(merged[column].dropna().unique().tolist())
+    else:
+        return []
 
 
 def country_sending_athletes(filters, top_n):
     df = utils.apply_filters(merged, filters)
-    df = df.rename(columns={"noc_y": "country", "noc_x": "noc"})
     df = df.dropna(subset=["country"])
 
     country_sending_athletes = df.groupby("country").size().reset_index(name="athlete_count")
