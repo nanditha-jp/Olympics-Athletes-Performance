@@ -9,3 +9,8 @@ def show():
     st.markdown("### 🗺️ Region sending athletes")
     fig = plot.plot_country_sending_athletes({}, top_n=10)
     st.plotly_chart(fig, use_container_width=True)
+
+
+    st.markdown("### 👫 Gender Participation")
+    fig = plot.plot_gender_participation({})
+    st.plotly_chart(fig, use_container_width=True)

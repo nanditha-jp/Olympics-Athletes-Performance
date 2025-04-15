@@ -17,3 +17,21 @@ def plot_country_sending_athletes(filters, top_n):
 
     fig.update_layout(title_x=0.5)
     return fig
+
+def plot_gender_participation(filters):
+    athlete_counts = analysis.gender_participation(filters)
+
+    # Plotly Express bar chart
+    fig = px.bar(
+        athlete_counts,
+        x='discipline',
+        y='Count',
+        color='sex',
+        barmode='group',
+        title='Number of Male and Female Athletes per Discipline',
+        labels={'Count': 'Number of Athletes'}
+    )
+
+    fig.update_layout(xaxis_tickangle=-45, title_x=0.5)
+
+    return fig

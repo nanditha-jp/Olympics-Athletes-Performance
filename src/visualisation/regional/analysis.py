@@ -31,3 +31,15 @@ def country_sending_athletes(filters, top_n):
         return country_sending_athletes.head(top_n)
 
     return country_sending_athletes
+
+def gender_participation(filters):
+    df = utils.apply_filters(merged, filters)
+
+    # Count of athletes by Discipline and Sex
+    athlete_counts = (
+        df.groupby(['discipline', 'sex'])['athlete_id']
+        .nunique()
+        .reset_index(name='Count')
+    )
+
+    return athlete_counts
