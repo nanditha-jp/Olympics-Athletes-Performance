@@ -3,6 +3,13 @@ from streamlit_option_menu import option_menu
 
 from utils import css
 
+# Constants
+PAGE_CONFIG = {
+    "page_title": "Athletes Performance App",
+    "page_icon": "🏋🏻"
+}
+st.set_page_config(**PAGE_CONFIG)
+
 # Read from GET params
 params = st.query_params
 selected_page = params.get("page", "Home")
@@ -20,6 +27,9 @@ with st.sidebar:
         default_index=pages.index(selected_page)
     )
 
+
+# Inject CSS
+css.inject_css()
 
 if page == "Overview":
     from webpages import overview
@@ -51,4 +61,5 @@ elif page == "Ask the AI":
     assistant.show()
 
 elif page == "Home":
-    st.header("Olympics Athlete Performance Analysis")
+    from webpages import home
+    home.show()
