@@ -26,6 +26,17 @@ def get_unique(column):
     else:
         return []
 
+def merge_lat_long(df):
+    noc_region_path = "https://raw.githubusercontent.com/prasertcbs/basic-dataset/refs/heads/master/noc_regions.csv"
+    noc_region = utils.load_data(noc_region_path, logger)
+    lat_long_path = "https://raw.githubusercontent.com/google/dspl/master/samples/google/canonical/countries.csv"
+    lat_long = utils.load_data(lat_long_path, logger)
+
+    lat_long = lat_long.merge(noc_region, left_on="name", right_on="region", how="inner")
+
+    df = df.merge(lat_long, left_on="noc", right_on="NOC", how="left")
+    return df
+
 
 def country_sending_athletes(filters, top_n):
     df = utils.apply_filters(merged, filters)
@@ -38,6 +49,21 @@ def country_sending_athletes(filters, top_n):
         return country_sending_athletes.head(top_n)
 
     return country_sending_athletes
+
+def region_sending_athletes(filters):
+    df = utils.apply_filters(merged, filters)
+    df = merge_lat_long(df)
+    df.dropna(subset=["latitude", "longitude"], inplace=True)
+
+    region_sending_athletes = df.groupby("noc").agg({
+        "athlete_id": "count",
+        "latitude": "mean",
+        "longitude": "mean"
+    }).reset_index()
+    
+    region_sending_athletes.rename(columns={"athlete_id": "total_athletes"}, inplace=True)
+
+    return region_sending_athletes
 
 def gender_participation(filters):
     df = utils.apply_filters(merged, filters)

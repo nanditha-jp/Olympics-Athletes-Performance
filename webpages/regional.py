@@ -1,5 +1,6 @@
 import streamlit as st
 from src.visualisation.regional import plot, analysis
+from streamlit_folium import st_folium
 
 
 def show():
@@ -16,6 +17,10 @@ def show():
         "year": year_filter if len(year_filter) > 0 else analysis.get_unique(column="year"),
         "country": country_filter if len(country_filter) > 0 else analysis.get_unique(column="country"),
     }
+
+    st.markdown("#### 🌎 Region sending athletes on a world map")
+    folium_map = plot.plot_region_sending_athletes_map(filters)
+    st_folium(folium_map, width=900, height=600)
 
     st.markdown("### 🗺️ Region sending athletes")
     fig = plot.plot_country_sending_athletes(filters, top_n=10)
