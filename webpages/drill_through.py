@@ -40,6 +40,10 @@ def show():
     fig = plot.plot_participation_trend_over_time(filters)
     st.plotly_chart(fig, use_container_width=True)
 
+    st.markdown("### 📈 Sport with Highest growth in participation")
+    fig = plot.plot_sport_growth_participation(filters, top_n=12)
+    st.plotly_chart(fig, use_container_width=True)
+
 
 # Drill Through
 def drill_athlete(id):

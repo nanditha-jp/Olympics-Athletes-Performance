@@ -4,6 +4,8 @@ import pandas as pd
 import os
 import src.utils as utils
 
+from src.visualisation.drill_through import DAX
+
 # configure logger
 logger = utils.configure_logger("Drill Through", "drill_through.log")
 
@@ -90,3 +92,14 @@ def participation_trend_over_time(filters, past_n_years=10):
     yearly_counts.columns = ['Year', 'Athletes']
 
     return yearly_counts
+
+def sport_growth_participation(filters, top_n):
+    df = utils.apply_filters(merged, filters)
+
+    df = df.groupby("discipline").apply(DAX.participation_growth_rate).reset_index(name="participation_growth_rate")
+
+    df = df.sort_values(by="participation_growth_rate", ascending=False)
+
+    if top_n is not None:
+        return df.head(top_n)
+    return df

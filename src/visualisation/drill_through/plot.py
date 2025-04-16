@@ -30,3 +30,15 @@ def plot_participation_trend_over_time(filters, past_n_years=10):
         yaxis_tickformat=','
     )
     return fig
+
+def plot_sport_growth_participation(filters, top_n):
+    df = analysis.sport_growth_participation(filters, top_n).iloc[::-1]
+
+    # Plot using Plotly Express
+    fig = px.bar(df, x='participation_growth_rate', y='discipline',
+                 orientation="h", title='Sport with Highest growth in participation',
+                labels={'participation_growth_rate': 'Participation Growth Rate', 'discipline': 'Sport'},
+                color_discrete_sequence=['dodgerblue'])
+
+    fig.update_layout(xaxis_tickangle=-45)
+    return fig
