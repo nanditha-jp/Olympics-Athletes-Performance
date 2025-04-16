@@ -8,12 +8,13 @@ params = st.query_params
 selected_page = params.get("page", "Home")
 
 
-pages = ["Home", "Overview", "Insights", "Compare", "Ask the AI"]
+
+pages = ["Home", "Overview", "Regional", "Insights", "Compare", "Ask the AI"]
 with st.sidebar:
     page = option_menu(
         menu_title=None,
         options=pages,
-        icons=["house", "bar-chart", "funnel", "graph-up", "robot"],
+        icons=["house", "bar-chart", "globe", "funnel", "graph-up", "robot"],
         styles=css.get_menu_style(),
         default_index=pages.index(selected_page)
     )
@@ -22,6 +23,10 @@ with st.sidebar:
 if page == "Overview":
     from webpages import overview
     overview.show()
+
+elif page == "Regional":
+    from webpages import regional
+    regional.show()
 
 elif page == "Insights":
     from webpages import insights
