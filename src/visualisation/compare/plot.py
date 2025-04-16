@@ -1,5 +1,6 @@
 import plotly.express as px
 from src.visualisation.compare import analysis
+import folium
 
 def plot_compare_countries_by_medal(filters, sport, country_a, country_b):
     countries_df = analysis.compare_countries_by_medal(filters, sport, country_a, country_b)
@@ -67,3 +68,20 @@ def plot_medal_distribution_by_gender(filter):
         template="plotly_white"
     )
     return fig
+
+def plot_athlete_counts_by_country_map(filter):
+    df = analysis.athlete_counts_by_country(filter)
+
+    m = folium.Map(location=[20, 0], zoom_start=2)
+
+    for _, row in df.iterrows():
+        folium.CircleMarker(
+            location=[row["latitude"], row["longitude"]],
+            radius=row["total_athletes"]*0.0015,  # scale radius
+            popup=folium.Popup(f"NOC: {row['noc']}<br>Total Athletes: {row['total_athletes']}", max_width=200),
+            color='blue',
+            fill=True,
+            fill_opacity=0.6
+        ).add_to(m)
+
+    return m

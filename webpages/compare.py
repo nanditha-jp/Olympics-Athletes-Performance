@@ -1,5 +1,6 @@
 import streamlit as st
 from src.visualisation.compare import analysis, plot
+from streamlit_folium import st_folium
 
 
 def show():
@@ -37,3 +38,7 @@ def show():
     st.markdown("#### 👥 Athlete Participation Comparison")
     fig = plot.plot_compare_countries_by_athletes({}, selected_sports, country_a, country_b)
     st.plotly_chart(fig, use_container_width=True)
+
+    st.markdown("#### 👥 Athlete count by country on a world map")
+    folium_map = plot.plot_athlete_counts_by_country_map({})
+    st_folium(folium_map, width=900, height=600)
