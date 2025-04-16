@@ -1,5 +1,6 @@
 import streamlit as st
 from src.visualisation.insights import plot, analysis
+from streamlit_folium import st_folium
 
 
 def show():
@@ -33,6 +34,10 @@ def show():
     st.markdown("List may include more than 10 due to tied medal counts.")
     df = analysis.athletes_by_total_medal_by_their_country_and_event(filters)
     st.dataframe(df.head(10), use_container_width=True)
+
+    st.markdown("### 📝 Performance Score of NOC's in the World Map")
+    folium_map = plot.plot_performance_score_by_noc_map({})
+    st_folium(folium_map, width=1000, height=500)
 
     # Medal Distribution Chart
     st.markdown("### 🥇 Medal Distribution")
