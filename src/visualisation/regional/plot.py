@@ -64,3 +64,19 @@ def plot_gender_participation(filters):
     fig.update_layout(xaxis_tickangle=-45, title_x=0.5)
 
     return fig
+
+def plot_sport_medal_percentage(filters, top_n):
+    df = analysis.sport_medal_percentage(filters, top_n)
+
+    # Pie chart
+    fig = px.pie(
+        df,
+        names="discipline",
+        values="sport_performance_ratio",
+        color="sport_performance_ratio",
+        hole=0.3,
+    )
+
+    fig.update_traces(textinfo="percent", showlegend=False)
+    fig.update_layout(margin=dict(t=0, b=0, l=0, r=0))
+    return fig

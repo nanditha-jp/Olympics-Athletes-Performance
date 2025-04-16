@@ -4,6 +4,8 @@ import pandas as pd
 import os
 import src.utils as utils
 
+from src.visualisation.regional import DAX
+
 # configure logger
 logger = utils.configure_logger("Visualisation", "regional.log")
 
@@ -76,3 +78,31 @@ def gender_participation(filters):
     )
 
     return athlete_counts
+
+def medal_efficiency_ratio(filters):
+    df = utils.apply_filters(merged, filters)
+    
+    grouped = df.groupby("noc").apply(DAX.medal_efficiency_ratio).reset_index(name="medal_efficiency_ratio")
+
+    noc_region_path = "https://raw.githubusercontent.com/prasertcbs/basic-dataset/refs/heads/master/noc_regions.csv"
+    noc_region = utils.load_data(noc_region_path, logger)
+
+    df = grouped.merge(noc_region, left_on="noc", right_on="NOC", how="left")
+    df = df.sort_values(by="medal_efficiency_ratio", ascending=False)
+
+    return df[["region", "medal_efficiency_ratio"]].rename(columns={
+        "region": "Country",
+        "medal_efficiency_ratio": "Medal Efficiency Ratio"
+    })
+
+def sport_medal_percentage(filters, top_n):
+    df = utils.apply_filters(merged, filters)
+    total_medals = df[df['medal'].notna() & (df['medal'] != '')].shape[0]
+
+    df = df.groupby("discipline").apply(lambda x: DAX.sport_medal_percentage(x) / total_medals).reset_index(name="sport_performance_ratio")
+
+    if top_n is not None:
+        df = df.sort_values(by="sport_performance_ratio", ascending=False)
+        return df.head(top_n)
+
+    return df

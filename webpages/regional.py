@@ -30,3 +30,10 @@ def show():
     st.markdown("### 👫 Gender Participation")
     fig = plot.plot_gender_participation(filters)
     st.plotly_chart(fig, use_container_width=True)
+
+    st.markdown("### 🏆 Medal Efficiency Ratio")
+    st.dataframe(analysis.medal_efficiency_ratio(filters))
+
+    st.markdown("### 💪 Percentage Contribution of each sport to the total medal")
+    fig = plot.plot_sport_medal_percentage(filters, top_n=20)
+    st.plotly_chart(fig, use_container_width=True)
