@@ -3,10 +3,12 @@ import pandas as pd
 
 import re
 import os
-import src.utils as utils
+
+from src.utils.logger import configure_logger
+from src.utils import io
 
 # configure logger
-logger = utils.configure_logger("Cleaning Athletes Results", "clean_results.log")
+logger = configure_logger("Cleaning Athletes Results", "clean_results.log")
 
 
 def clean_game_column(data: pd.DataFrame) -> pd.DataFrame:
@@ -119,7 +121,7 @@ if __name__ == "__main__":
         data_path = os.path.join("data", "raw")
         file_path = os.path.join(data_path, "results.csv")
 
-        results = utils.load_data(file_path, logger)
+        results = io.load_data(file_path, logger)
         if results.empty:
             raise ValueError("Data is empty")
 
@@ -133,7 +135,7 @@ if __name__ == "__main__":
 
         # save data
         data_path = os.path.join("data", "interim")
-        utils.save_data(results, data_path, "results.csv", logger)
+        io.save_data(results, data_path, "results.csv", logger)
 
     except Exception as e:
         logger.error("Error cleaning athletes: %s", e)

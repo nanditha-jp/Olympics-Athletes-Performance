@@ -1,26 +1,20 @@
-import numpy as np
-import pandas as pd
-
 import os
-import src.utils as utils
+
+from src.utils.logger import configure_logger
+from src.utils.data_loader import load_and_merge_bios_results
+from src.utils.filters import apply_filters
+from src.utils.geo import merge_lat_long
 
 from src.visualisation.insights import DAX
 
 # configure logger
-logger = utils.configure_logger("Interactive Insights", "insights.log")
+logger = configure_logger("Interactive Insights", "insights.log")
 
 # load data
 data_path = os.path.join("data", "interim")
+bios_cols = ["athlete_id", "noc", "sex", "name"]
+merged, _, _ = load_and_merge_bios_results(data_path, logger, bios_cols=bios_cols)
 
-bios = utils.load_data(os.path.join(data_path, "bios.csv"), logger)
-results = utils.load_data(os.path.join(data_path, "results.csv"), logger)
-
-# merge data
-merged = results.merge(
-    bios[["athlete_id", "noc", "sex", "name"]], on="athlete_id", how="left"
-)
-
-merged = merged.rename(columns={"noc_y": "country", "noc_x": "noc"})
 
 # Utilities
 def get_unique(column):
@@ -29,28 +23,35 @@ def get_unique(column):
     else:
         return []
 
+
 # Analysis fns
 def participation_of_gender_over_time(filters):
-    df = utils.apply_filters(merged, filters)
+    df = apply_filters(merged, filters)
 
     # Group by Year and Sex to count athletes
-    df_grouped = df.groupby(["year", "sex"])["athlete_id"].count().reset_index(name="Participants")
+    df_grouped = (
+        df.groupby(["year", "sex"])["athlete_id"]
+        .count()
+        .reset_index(name="Participants")
+    )
 
     return df_grouped
 
-def athletes_by_total_medal_by_their_country_and_event(filters):
-    df = utils.apply_filters(merged, filters)
 
-    df = df[df['medal'].notnull()]
+def athletes_by_total_medal_by_their_country_and_event(filters):
+    df = apply_filters(merged, filters)
+
+    df = df[df["medal"].notnull()]
     # Group by Full name, born_country (or NOC), and Event to count medals
-    grouped = df.groupby(['name', 'country', 'event']).size().reset_index(name='Medals')
+    grouped = df.groupby(["name", "country", "event"]).size().reset_index(name="Medals")
 
     # Sort by Medals descending
-    top_medalists = grouped.sort_values(by='Medals', ascending=False)
+    top_medalists = grouped.sort_values(by="Medals", ascending=False)
     return top_medalists
 
+
 def medal_distribution(filters):
-    df = utils.apply_filters(merged, filters)
+    df = apply_filters(merged, filters)
     df = df.dropna(subset=["medal"])
 
     # Count medals
@@ -59,19 +60,23 @@ def medal_distribution(filters):
 
     return medal_counts
 
+
 def performance_score_by_noc(filters):
-    df = utils.apply_filters(merged, filters)
-    df = utils.merge_lat_long(df, logger)
+    df = apply_filters(merged, filters)
+    df = merge_lat_long(df, logger)
     df.dropna(subset=["latitude", "longitude"], inplace=True)
 
     # Basic grouped metrics
-    grouped = df.groupby("noc").agg({
-        "latitude": "mean",
-        "longitude": "mean"
-    }).reset_index()
+    grouped = (
+        df.groupby("noc").agg({"latitude": "mean", "longitude": "mean"}).reset_index()
+    )
 
     # Performance score separately using groupby + apply
-    performance = df.groupby("noc").apply(DAX.performance_score).reset_index(name="Performance Score")
+    performance = (
+        df.groupby("noc")
+        .apply(DAX.performance_score)
+        .reset_index(name="Performance Score")
+    )
 
     # Merge them
     df = grouped.merge(performance, on="noc", how="left")

@@ -2,23 +2,24 @@ import numpy as np
 import pandas as pd
 
 import os
-import src.utils as utils
+
+from src.utils.logger import configure_logger
+from src.utils.data_loader import load_and_merge_bios_results
+from src.utils.filters import apply_filters
+
 from src.visualisation.overview import DAX
 
 # configure logger
-logger = utils.configure_logger("Visualisation", "overview_dax.log")
+logger = configure_logger("Visualisation", "overview_dax.log")
 
 # load data
 data_path = os.path.join("data", "interim")
 
-bios = utils.load_data(os.path.join(data_path, "bios.csv"), logger)
-results = utils.load_data(os.path.join(data_path, "results.csv"), logger)
-
-# merge data
-results = results.merge(
-    bios[["athlete_id", "born_year", "sex", "height"]], on="athlete_id", how="left"
+bios_col = ["athlete_id", "born_year", "sex", "height"]
+merged, bios, results = load_and_merge_bios_results(
+    data_path, logger, bios_cols=bios_col
 )
-results["age"] = results["year"].astype(float) - results["born_year"].astype(float)
+merged["age"] = merged["year"].astype(float) - merged["born_year"].astype(float)
 
 
 # Utilities
@@ -33,28 +34,28 @@ def get_unique(column):
 
 # load metrics
 def get_total_athletes(filters):
-    df = utils.apply_filters(results, filters)
+    df = apply_filters(results, filters)
     return DAX.total_athletes(df)
 
 
 def get_total_events(filters):
-    df = utils.apply_filters(results, filters)
+    df = apply_filters(results, filters)
     return DAX.total_events(df)
 
 
 def get_avg_height(filters):
-    df = utils.apply_filters(results, filters)
+    df = apply_filters(merged, filters)
     return DAX.avg_height(df)
 
 
 def get_avg_age(filters):
-    df = utils.apply_filters(results, filters)
+    df = apply_filters(merged, filters)
     return DAX.avg_age(df)
 
 
 # Analysis fns
 def top_performing_countries(filters, top_n=10):
-    df = utils.apply_filters(results, filters)
+    df = apply_filters(results, filters)
 
     top_countries = (
         df.groupby("noc")["medal"]
@@ -67,7 +68,7 @@ def top_performing_countries(filters, top_n=10):
 
 
 def medal_distribution(filters):
-    df = utils.apply_filters(results, filters)
+    df = apply_filters(results, filters)
     df = df.dropna(subset=["medal"])
 
     # Count medals
@@ -78,7 +79,7 @@ def medal_distribution(filters):
 
 
 def medal_trend_over_time(filters):
-    df = utils.apply_filters(results, filters)
+    df = apply_filters(results, filters)
     df = df.dropna(subset=["medal"])
     # Group by year
     yearly_counts = df.groupby("year").size().reset_index(name="medal_count")
@@ -87,7 +88,7 @@ def medal_trend_over_time(filters):
 
 
 def gender_distribution_across_sports(filters, top_n=10):
-    df = utils.apply_filters(results, filters)
+    df = apply_filters(merged, filters)
     # Clean data: drop rows with missing sport, athlete_id or sex
     df = df.dropna(subset=["discipline", "athlete_id", "sex"])
 

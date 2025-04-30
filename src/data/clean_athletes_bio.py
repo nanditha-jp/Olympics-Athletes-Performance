@@ -2,11 +2,13 @@ import numpy as np
 import pandas as pd
 
 import os
-import src.utils as utils
+
+from src.utils.logger import configure_logger
+from src.utils import io
 
 
 # configure logger
-logger = utils.configure_logger("Cleaning Athletes Bio", "clean_bios.log")
+logger = configure_logger("Cleaning Athletes Bio", "clean_bios.log")
 
 
 def clean_name(data: pd.DataFrame) -> pd.DataFrame:
@@ -141,7 +143,7 @@ if __name__ == "__main__":
         data_path = os.path.join("data", "raw")
         file_path = os.path.join(data_path, "bios.csv")
 
-        bios = utils.load_data(file_path, logger)
+        bios = io.load_data(file_path, logger)
         if bios.empty:
             raise ValueError("Data is empty")
 
@@ -156,7 +158,7 @@ if __name__ == "__main__":
 
         # save data
         data_path = os.path.join("data", "interim")
-        utils.save_data(bios, data_path, "bios.csv", logger)
+        io.save_data(bios, data_path, "bios.csv", logger)
 
     except Exception as e:
         logger.error("Error cleaning athletes: %s", e)
