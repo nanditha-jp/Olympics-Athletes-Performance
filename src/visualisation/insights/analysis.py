@@ -59,20 +59,9 @@ def medal_distribution(filters):
 
     return medal_counts
 
-def merge_lat_long(df):
-    noc_region_path = "https://raw.githubusercontent.com/prasertcbs/basic-dataset/refs/heads/master/noc_regions.csv"
-    noc_region = utils.load_data(noc_region_path, logger)
-    lat_long_path = "https://raw.githubusercontent.com/google/dspl/master/samples/google/canonical/countries.csv"
-    lat_long = utils.load_data(lat_long_path, logger)
-
-    lat_long = lat_long.merge(noc_region, left_on="name", right_on="region", how="inner")
-
-    df = df.merge(lat_long, left_on="noc", right_on="NOC", how="left")
-    return df
-
 def performance_score_by_noc(filters):
     df = utils.apply_filters(merged, filters)
-    df = merge_lat_long(df)
+    df = utils.merge_lat_long(df, logger)
     df.dropna(subset=["latitude", "longitude"], inplace=True)
 
     # Basic grouped metrics
