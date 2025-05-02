@@ -1,7 +1,10 @@
 import streamlit as st
+
 from src.visualisation.drill_through import analysis, plot
 from src.visualisation.overview.analysis import get_unique
 from src.visualisation.drill_through.formatter import add_athlete_link, add_country_link
+
+from . import athletes
 
 def show():
     st.header("🔍 Drill Through Dashboard")
@@ -47,8 +50,7 @@ def show():
 
 # Drill Through
 def drill_athlete(id):
-    st.markdown(f"### 🎯 Athlete Detail: ID {id}")
-    st.dataframe(analysis.drill_athlete(id))
+    athletes.show(id)
 
 def drill_country(noc):
     st.markdown(f"### 🌍 Country Detail: {noc}")
