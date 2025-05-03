@@ -1,4 +1,5 @@
 import streamlit as st
+from utils import testimonials
 
 def feature_card(emoji: str, title: str, description: str):
     """Create a feature card component"""
@@ -29,8 +30,15 @@ def show():
         for col, feature in zip(cols, features):
             with col:
                 st.markdown(feature_card(*feature), unsafe_allow_html=True)
+    
+    st.text("")
+    st.text("")
+    
+    testimonials.show_testimonials()
 
-    st.markdown("---")
+    st.text("")
+    st.text("")
+
     st.markdown("### 🧭 How to Use This Dashboard")
     st.markdown("""
     - Navigate between pages from the sidebar.
